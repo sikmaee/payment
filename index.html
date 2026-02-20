@@ -1,181 +1,248 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUXXI | Authorized Payment Terminal</title>
+    <title>RUXXI | Ultra-Electric Payment Terminal</title>
     <!-- Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Icons & Fonts -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --electric-cyan: #00f2ff;
-            --electric-purple: #7000ff;
-            --bg-deep: #020205;
+            --electric-purple: #9d00ff;
+            --electric-blue: #2200ff;
+            --gopay-green: #00d215;
+            --shopee-orange: #ff4500;
+            --bg-ultra: #020205;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-deep);
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-ultra);
             color: #ffffff;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* Ambient Energy Glow */
-        .energy-field {
+        /* High-Voltage Background */
+        .electric-bg {
             position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.08) 0%, transparent 70%);
+            inset: 0;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(157, 0, 255, 0.05) 0%, transparent 40%),
+                linear-gradient(to bottom, #020205, #05050f);
             z-index: -1;
-            filter: blur(80px);
-            animation: pulse-energy 10s infinite alternate;
         }
 
-        @keyframes pulse-energy {
-            from { transform: translate(-10%, -10%); opacity: 0.5; }
-            to { transform: translate(10%, 10%); opacity: 0.8; }
+        .neon-flicker {
+            animation: flicker 4s linear infinite;
         }
 
-        /* Electric Card Styling */
-        .electric-card {
-            background: rgba(15, 15, 20, 0.8);
-            backdrop-filter: blur(40px);
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 0 0 10px var(--electric-cyan), 0 0 20px var(--electric-cyan);
+                opacity: 1;
+            }
+            20%, 22%, 24%, 55% {
+                text-shadow: none;
+                opacity: 0.8;
+            }
+        }
+
+        .ultra-card {
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(50px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9);
             position: relative;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
         }
 
-        /* Laser Scan Line */
-        .scanner-line {
+        .energy-border {
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(90deg, var(--electric-cyan), var(--electric-purple), var(--electric-blue), var(--electric-cyan));
+            background-size: 400% 400%;
+            z-index: -1;
+            border-radius: inherit;
+            animation: moveGradient 8s linear infinite;
+            opacity: 0.15;
+        }
+
+        @keyframes moveGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .electric-scan {
             width: 100%;
-            height: 2px;
+            height: 4px;
             background: var(--electric-cyan);
             position: absolute;
             z-index: 20;
-            animation: scan-action 3.5s ease-in-out infinite;
-            box-shadow: 0 0 15px var(--electric-cyan);
+            animation: scan-vertical 4s ease-in-out infinite;
+            box-shadow: 0 0 20px var(--electric-cyan);
         }
 
-        @keyframes scan-action {
+        @keyframes scan-vertical {
             0% { top: 0%; opacity: 0; }
-            50% { opacity: 1; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Buttons */
-        .btn-main {
-            background: linear-gradient(135deg, #0062ff, var(--electric-purple));
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-main:hover {
-            filter: brightness(1.2);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.4);
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--electric-cyan); border-radius: 10px; }
 
         [v-cloak] { display: none; }
     </style>
 </head>
-<body class="flex items-center justify-center p-6">
+<body class="flex items-center justify-center p-4 md:p-10">
+    <div class="electric-bg"></div>
 
-    <div id="app" v-cloak class="w-full max-w-lg relative">
-        <!-- Background Effects -->
-        <div class="energy-field top-0 left-0"></div>
-        <div class="energy-field bottom-0 right-0" style="background: radial-gradient(circle, rgba(112, 0, 255, 0.05) 0%, transparent 70%);"></div>
-
-        <!-- App Header -->
-        <header class="text-center mb-10">
-            <div class="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/5 backdrop-blur-md">
-                <i class="ph-fill ph-shield-check text-cyan-400"></i>
-                <span class="text-[9px] uppercase tracking-[0.4em] font-black text-cyan-400">Authorized Terminal</span>
+    <div id="app" v-cloak class="w-full max-w-xl relative py-10">
+        
+        <!-- Status Bar -->
+        <div class="flex justify-between items-center mb-8 px-4 font-mono text-[8px] uppercase tracking-[0.4em] text-cyan-400/40">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_#00f2ff]"></span>
+                System: Active
             </div>
-            <h1 class="text-7xl font-black tracking-tighter italic mb-2">
+            <div>Auth: RUXXI_X05_GLOBAL</div>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-7xl md:text-8xl font-black tracking-tighter italic neon-flicker text-white">
                 RUXXI<span class="text-cyan-400">.</span>
             </h1>
-            <p class="text-gray-500 text-[10px] tracking-[0.6em] uppercase font-bold">Electric Digital Asset</p>
+            <div class="flex items-center justify-center gap-4 mt-4">
+                <div class="h-[1px] w-8 bg-cyan-500/30"></div>
+                <p class="text-gray-500 text-[9px] tracking-[0.6em] uppercase font-bold">Multi-Channel Terminal</p>
+                <div class="h-[1px] w-8 bg-cyan-500/30"></div>
+            </div>
         </header>
 
         <!-- Main Card -->
-        <main class="electric-card rounded-[3rem] p-1 overflow-hidden">
-            <div class="p-10">
-                <!-- QRIS Visualizer -->
-                <div class="relative group mb-14">
-                    <div class="absolute -inset-4 bg-cyan-500/10 blur-3xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="relative bg-white rounded-[2.5rem] p-5 shadow-2xl overflow-hidden transition-transform duration-500 group-hover:scale-[1.01]">
-                        <!-- Scanner Effect -->
-                        <div class="scanner-line"></div>
-                        
-                        <div class="rounded-[1.5rem] overflow-hidden border border-gray-100">
+        <main class="ultra-card rounded-[3rem] md:rounded-[4rem] p-1 overflow-hidden">
+            <div class="energy-border"></div>
+            <div class="p-8 md:p-14">
+                
+                <!-- QRIS Section (The Screenshot Instruction) -->
+                <div class="relative group mb-20">
+                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-full text-center">
+                        <span class="text-[10px] text-cyan-400 font-bold tracking-[0.3em] uppercase animate-bounce">
+                            <i class="ph ph-camera text-sm inline-block mr-2"></i> Screenshot QRIS di bawah
+                        </span>
+                    </div>
+
+                    <div class="absolute -inset-8 bg-cyan-500/10 blur-[80px] rounded-full opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                    
+                    <!-- QRIS Container -->
+                    <div class="relative bg-white rounded-[2.5rem] p-5 shadow-2xl overflow-hidden ring-1 ring-white/10 transition-transform duration-700">
+                        <div class="electric-scan"></div>
+                        <div class="rounded-[1.5rem] overflow-hidden">
                             <img 
-                                :src="qrisUrl" 
+                                :src="getQrisUrl()" 
                                 alt="RUXXI QRIS" 
                                 class="w-full aspect-square object-cover"
-                                @error="handleImgError"
                             >
                         </div>
                     </div>
 
-                    <!-- Download Button -->
-                    <button 
-                        @click="downloadQRIS" 
-                        class="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-white text-black px-10 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-[0_20px_40px_rgba(0,0,0,0.6)] flex items-center gap-3 transition-all hover:bg-cyan-400 hover:scale-105 active:scale-95 z-30"
-                        :disabled="isDownloading"
-                    >
-                        <i :class="isDownloading ? 'ph ph-circle-notch animate-spin' : 'ph-fill ph-download-simple'" class="text-lg"></i>
-                        {{ isDownloading ? 'Encrypting' : 'Simpan QRIS' }}
-                    </button>
+                    <!-- Button Action -->
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-full flex justify-center gap-3">
+                        <button 
+                            @click="triggerScreenshotHint"
+                            class="bg-cyan-500 text-black px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-2 hover:scale-105 transition-all active:scale-95"
+                        >
+                            <i class="ph-fill ph-camera"></i> Siapkan Screenshot
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Payment Endpoint -->
-                <section class="mt-20">
-                    <div class="relative group">
-                        <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-[2.5rem] blur opacity-10"></div>
-                        <div class="relative bg-black/40 border border-white/5 rounded-[2.5rem] p-8 flex flex-col items-center">
-                            <span class="text-[9px] text-gray-500 font-bold uppercase tracking-[0.4em] mb-4 text-center">Transfer Direct DANA</span>
-                            
-                            <h2 class="text-5xl font-bold tracking-tighter text-white mb-6 font-mono italic">
-                                {{ danaNumber }}
-                            </h2>
-
-                            <button 
-                                @click="copyNumber" 
-                                class="w-full btn-main text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 active:scale-[0.98]"
-                            >
-                                <i :class="isCopied ? 'ph-fill ph-check-circle' : 'ph ph-copy'" class="text-xl"></i>
-                                {{ isCopied ? 'Nomor Berhasil Disalin' : 'Salin Nomor Dana' }}
-                            </button>
+                <!-- Payment Methods Grid -->
+                <div class="mt-16 space-y-4">
+                    <p class="text-center text-[10px] text-gray-600 uppercase tracking-[0.5em] font-bold mb-6 italic">Manual Transfer Endpoints</p>
+                    
+                    <!-- DANA -->
+                    <div class="group relative bg-black/40 border border-white/5 p-6 rounded-3xl flex items-center justify-between hover:bg-white/5 transition-all duration-300">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 bg-blue-600/20 rounded-2xl flex items-center justify-center border border-blue-500/20 group-hover:border-blue-500/50">
+                                <i class="ph ph-wallet text-blue-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">DANA Account</p>
+                                <p class="text-xl font-bold tracking-tight text-white">{{ danaNumber }}</p>
+                            </div>
                         </div>
+                        <button @click="copyText(danaNumber, 'DANA')" class="p-3 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all">
+                            <i class="ph ph-copy text-xl"></i>
+                        </button>
                     </div>
-                </section>
 
-                <!-- Footer Metadata -->
-                <div class="mt-12 flex justify-between px-2 font-mono text-[8px] text-gray-600 uppercase tracking-tighter opacity-50">
-                    <div>Protocol: RX-ELECTRIC-V2</div>
-                    <div class="text-right">Clock: {{ currentTime }}</div>
+                    <!-- GOPAY -->
+                    <div class="group relative bg-black/40 border border-white/5 p-6 rounded-3xl flex items-center justify-between hover:bg-white/5 transition-all duration-300">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 bg-green-600/20 rounded-2xl flex items-center justify-center border border-green-500/20 group-hover:border-green-500/50">
+                                <i class="ph ph-lightning text-green-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">GOPAY Account</p>
+                                <p class="text-xl font-bold tracking-tight text-white">{{ gopayNumber }}</p>
+                            </div>
+                        </div>
+                        <button @click="copyText(gopayNumber, 'GOPAY')" class="p-3 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all">
+                            <i class="ph ph-copy text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- SHOPEEPAY -->
+                    <div class="group relative bg-black/40 border border-white/5 p-6 rounded-3xl flex items-center justify-between hover:bg-white/5 transition-all duration-300">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 bg-orange-600/20 rounded-2xl flex items-center justify-center border border-orange-500/20 group-hover:border-orange-500/50">
+                                <i class="ph ph-shopping-cart-simple text-orange-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">SHOPEEPAY Account</p>
+                                <p class="text-xl font-bold tracking-tight text-white">{{ shopeeNumber }}</p>
+                            </div>
+                        </div>
+                        <button @click="copyText(shopeeNumber, 'SHOPEEPAY')" class="p-3 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all">
+                            <i class="ph ph-copy text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer Stats -->
+                <div class="mt-16 flex justify-between px-2 font-mono text-[8px] text-gray-700 uppercase">
+                    <div>SECURE_LAYER: AES-256</div>
+                    <div>TIMESTAMP: {{ currentTime }}</div>
                 </div>
             </div>
         </main>
 
+        <!-- Branding -->
+        <footer class="mt-16 text-center opacity-40">
+            <p class="text-[9px] text-gray-600 font-black uppercase tracking-[0.8em]">Verified Asset by RUXXI ARCHIVE</p>
+        </footer>
+
         <!-- Toast Notification -->
         <transition name="toast">
-            <div v-if="notification" class="fixed top-10 left-1/2 -translate-x-1/2 z-[100]">
-                <div class="bg-cyan-500 text-black px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_0_40px_rgba(0,242,255,0.4)] flex items-center gap-3 border border-white/20">
-                    <i class="ph-fill ph-lightning text-base"></i>
+            <div v-if="notification" class="fixed top-10 left-1/2 -translate-x-1/2 z-[100] w-max">
+                <div class="bg-white text-black px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-3">
+                    <i class="ph-fill ph-check-circle text-cyan-500 text-lg"></i>
                     {{ notification }}
                 </div>
             </div>
         </transition>
-
-        <footer class="mt-14 text-center opacity-30">
-            <p class="text-[9px] font-bold uppercase tracking-[0.8em]">RUXXI ARCHIVE &copy; 2026</p>
-        </footer>
     </div>
 
     <script>
@@ -183,17 +250,38 @@
 
         createApp({
             setup() {
-                // Link QRIS Catbox yang baru
-                const qrisUrl = ref("https://files.catbox.moe/bwnzn5.jpg"); 
+                const driveId = "1iY4FdBBX-r6SFUHsOcy9WOsqsHqSV-3I";
                 const danaNumber = ref("0812-2788-0615");
+                const gopayNumber = ref("0812-2788-0615");
+                const shopeeNumber = ref("0812-2788-0615");
                 
                 const notification = ref(null);
-                const isCopied = ref(false);
-                const isDownloading = ref(false);
                 const currentTime = ref("");
+
+                const getQrisUrl = () => `https://lh3.googleusercontent.com/u/0/d/${driveId}=w1200-h1200-iv1`;
 
                 const updateTime = () => {
                     currentTime.value = new Date().toLocaleTimeString('en-GB', { hour12: false });
+                };
+
+                const copyText = (text, provider) => {
+                    const clean = text.replace(/\D/g, '');
+                    const el = document.createElement('textarea');
+                    el.value = clean;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    showNotification(`${provider} Number Copied`);
+                };
+
+                const triggerScreenshotHint = () => {
+                    showNotification("Silakan Screenshot Layar Sekarang!");
+                };
+
+                const showNotification = (msg) => {
+                    notification.value = msg;
+                    setTimeout(() => notification.value = null, 3000);
                 };
 
                 onMounted(() => {
@@ -201,77 +289,7 @@
                     setInterval(updateTime, 1000);
                 });
 
-                const showNotification = (msg) => {
-                    notification.value = msg;
-                    setTimeout(() => notification.value = null, 3000);
-                };
-
-                const copyNumber = () => {
-                    const raw = danaNumber.value.replace(/\D/g, '');
-                    const el = document.createElement('textarea');
-                    el.value = raw;
-                    document.body.appendChild(el);
-                    el.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(el);
-                    isCopied.value = true;
-                    showNotification("Data Injected to Clipboard");
-                    setTimeout(() => isCopied.value = false, 2000);
-                };
-
-                /**
-                 * Canvas-Based Download Logic
-                 * Memaksa browser mengunduh binary data agar tidak sekadar membuka gambar.
-                 */
-                const downloadQRIS = async () => {
-                    isDownloading.value = true;
-                    try {
-                        const img = new Image();
-                        img.crossOrigin = "anonymous"; // Request CORS access
-                        img.src = qrisUrl.value;
-
-                        img.onload = () => {
-                            const canvas = document.createElement("canvas");
-                            canvas.width = img.naturalWidth;
-                            canvas.height = img.naturalHeight;
-                            const ctx = canvas.getContext("2d");
-                            ctx.drawImage(img, 0, 0);
-
-                            canvas.toBlob((blob) => {
-                                if (!blob) throw new Error("Processing failed");
-                                const url = window.URL.createObjectURL(blob);
-                                const link = document.createElement('a');
-                                link.href = url;
-                                link.download = `RUXXI-QRIS-${Date.now()}.png`;
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                window.URL.revokeObjectURL(url);
-                                showNotification("QRIS Berhasil Diunduh");
-                                isDownloading.value = false;
-                            }, 'image/png');
-                        };
-
-                        img.onerror = () => {
-                            // Emergency Fallback
-                            window.open(qrisUrl.value, '_blank');
-                            showNotification("Gagal Otomatis. Gunakan Save Manual.");
-                            isDownloading.value = false;
-                        };
-
-                    } catch (e) {
-                        console.error(e);
-                        window.open(qrisUrl.value, '_blank');
-                        showNotification("Membuka Gambar. Silakan Simpan Manual.");
-                        isDownloading.value = false;
-                    }
-                };
-
-                const handleImgError = (e) => {
-                    e.target.src = "https://placehold.co/1000x1000/000000/00f2ff?text=RELOAD+QRIS";
-                };
-
-                return { danaNumber, qrisUrl, notification, isCopied, isDownloading, currentTime, copyNumber, downloadQRIS, handleImgError };
+                return { danaNumber, gopayNumber, shopeeNumber, notification, currentTime, getQrisUrl, copyText, triggerScreenshotHint };
             }
         }).mount('#app');
     </script>
