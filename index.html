@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -44,21 +44,11 @@
 
         /* Electric Card Styling */
         .electric-card {
-            background: rgba(15, 15, 20, 0.7);
+            background: rgba(15, 15, 20, 0.8);
             backdrop-filter: blur(40px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9);
             position: relative;
-        }
-
-        .electric-card::after {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            background: linear-gradient(135deg, var(--electric-cyan), var(--electric-purple));
-            z-index: -1;
-            border-radius: inherit;
-            opacity: 0.15;
         }
 
         /* Laser Scan Line */
@@ -118,26 +108,28 @@
                 <!-- QRIS Visualizer -->
                 <div class="relative group mb-14">
                     <div class="absolute -inset-4 bg-cyan-500/10 blur-3xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="relative bg-white rounded-[2.5rem] p-5 shadow-2xl overflow-hidden">
+                    <div class="relative bg-white rounded-[2.5rem] p-5 shadow-2xl overflow-hidden transition-transform duration-500 group-hover:scale-[1.01]">
                         <!-- Scanner Effect -->
                         <div class="scanner-line"></div>
                         
-                        <div class="rounded-[1.5rem] overflow-hidden">
+                        <div class="rounded-[1.5rem] overflow-hidden border border-gray-100">
                             <img 
-                                :src="qrisDisplayUrl" 
+                                :src="qrisUrl" 
                                 alt="RUXXI QRIS" 
                                 class="w-full aspect-square object-cover"
+                                @error="handleImgError"
                             >
                         </div>
                     </div>
 
                     <!-- Download Button -->
                     <button 
-                        @click="handleDownload" 
+                        @click="downloadQRIS" 
                         class="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-white text-black px-10 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-[0_20px_40px_rgba(0,0,0,0.6)] flex items-center gap-3 transition-all hover:bg-cyan-400 hover:scale-105 active:scale-95 z-30"
+                        :disabled="isDownloading"
                     >
-                        <i :class="isActionLoading ? 'ph ph-circle-notch animate-spin' : 'ph-fill ph-download-simple'" class="text-lg"></i>
-                        {{ isActionLoading ? 'Processing' : 'Simpan QRIS' }}
+                        <i :class="isDownloading ? 'ph ph-circle-notch animate-spin' : 'ph-fill ph-download-simple'" class="text-lg"></i>
+                        {{ isDownloading ? 'Encrypting' : 'Simpan QRIS' }}
                     </button>
                 </div>
 
@@ -146,43 +138,43 @@
                     <div class="relative group">
                         <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-[2.5rem] blur opacity-10"></div>
                         <div class="relative bg-black/40 border border-white/5 rounded-[2.5rem] p-8 flex flex-col items-center">
-                            <span class="text-[9px] text-gray-500 font-bold uppercase tracking-[0.4em] mb-4">Transfer Direct DANA</span>
+                            <span class="text-[9px] text-gray-500 font-bold uppercase tracking-[0.4em] mb-4 text-center">Transfer Direct DANA</span>
                             
                             <h2 class="text-5xl font-bold tracking-tighter text-white mb-6 font-mono italic">
-                                {{ danaAccount }}
+                                {{ danaNumber }}
                             </h2>
 
                             <button 
-                                @click="copyToClipboard" 
+                                @click="copyNumber" 
                                 class="w-full btn-main text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 active:scale-[0.98]"
                             >
                                 <i :class="isCopied ? 'ph-fill ph-check-circle' : 'ph ph-copy'" class="text-xl"></i>
-                                {{ isCopied ? 'Nomor Disalin' : 'Salin Nomor Dana' }}
+                                {{ isCopied ? 'Nomor Berhasil Disalin' : 'Salin Nomor Dana' }}
                             </button>
                         </div>
                     </div>
                 </section>
 
                 <!-- Footer Metadata -->
-                <div class="mt-12 flex justify-between px-2 font-mono text-[8px] text-gray-600 uppercase tracking-tighter">
-                    <div>Status: Secure Connection</div>
-                    <div class="text-right">Time: {{ clockTime }}</div>
+                <div class="mt-12 flex justify-between px-2 font-mono text-[8px] text-gray-600 uppercase tracking-tighter opacity-50">
+                    <div>Protocol: RX-ELECTRIC-V2</div>
+                    <div class="text-right">Clock: {{ currentTime }}</div>
                 </div>
             </div>
         </main>
 
         <!-- Toast Notification -->
         <transition name="toast">
-            <div v-if="alertMsg" class="fixed top-10 left-1/2 -translate-x-1/2 z-[100]">
+            <div v-if="notification" class="fixed top-10 left-1/2 -translate-x-1/2 z-[100]">
                 <div class="bg-cyan-500 text-black px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_0_40px_rgba(0,242,255,0.4)] flex items-center gap-3 border border-white/20">
                     <i class="ph-fill ph-lightning text-base"></i>
-                    {{ alertMsg }}
+                    {{ notification }}
                 </div>
             </div>
         </transition>
 
         <footer class="mt-14 text-center opacity-30">
-            <p class="text-[9px] font-bold uppercase tracking-[0.8em]">RUXXI ARCHIVE &copy; 2024</p>
+            <p class="text-[9px] font-bold uppercase tracking-[0.8em]">RUXXI ARCHIVE &copy; 2026</p>
         </footer>
     </div>
 
@@ -191,92 +183,95 @@
 
         createApp({
             setup() {
-                // Konfigurasi
-                const gDriveId = "1iY4FdBBX-r6SFUHsOcy9WOsqsHqSV-3I";
-                const danaAccount = ref("0812-2788-0615");
+                // Link QRIS Catbox yang baru
+                const qrisUrl = ref("https://files.catbox.moe/bwnzn5.jpg"); 
+                const danaNumber = ref("0812-2788-0615");
                 
-                // State
-                const qrisDisplayUrl = ref(`https://lh3.googleusercontent.com/u/0/d/${gDriveId}=w1000-h1000-iv1`);
-                const alertMsg = ref(null);
+                const notification = ref(null);
                 const isCopied = ref(false);
-                const isActionLoading = ref(false);
-                const clockTime = ref("");
+                const isDownloading = ref(false);
+                const currentTime = ref("");
 
-                const updateClock = () => {
-                    clockTime.value = new Date().toLocaleTimeString('en-GB', { hour12: false });
+                const updateTime = () => {
+                    currentTime.value = new Date().toLocaleTimeString('en-GB', { hour12: false });
                 };
 
-                const showAlert = (m) => {
-                    alertMsg.value = m;
-                    setTimeout(() => alertMsg.value = null, 3000);
+                onMounted(() => {
+                    updateTime();
+                    setInterval(updateTime, 1000);
+                });
+
+                const showNotification = (msg) => {
+                    notification.value = msg;
+                    setTimeout(() => notification.value = null, 3000);
                 };
 
-                const copyToClipboard = () => {
-                    const raw = danaAccount.value.replace(/\D/g, '');
-                    const tmp = document.createElement('textarea');
-                    tmp.value = raw;
-                    document.body.appendChild(tmp);
-                    tmp.select();
+                const copyNumber = () => {
+                    const raw = danaNumber.value.replace(/\D/g, '');
+                    const el = document.createElement('textarea');
+                    el.value = raw;
+                    document.body.appendChild(el);
+                    el.select();
                     document.execCommand('copy');
-                    document.body.removeChild(tmp);
+                    document.body.removeChild(el);
                     isCopied.value = true;
-                    showAlert("Nomor Berhasil Disalin");
+                    showNotification("Data Injected to Clipboard");
                     setTimeout(() => isCopied.value = false, 2000);
                 };
 
                 /**
-                 * High-Security Download Method
+                 * Canvas-Based Download Logic
+                 * Memaksa browser mengunduh binary data agar tidak sekadar membuka gambar.
                  */
-                const handleDownload = async () => {
-                    isActionLoading.value = true;
-                    
-                    // Gunakan Promise agar try/catch bekerja dengan proses asinkron
-                    const loadImage = (url) => new Promise((resolve, reject) => {
-                        const img = new Image();
-                        img.crossOrigin = "anonymous";
-                        img.onload = () => resolve(img);
-                        img.onerror = () => reject(new Error("Gagal memuat gambar"));
-                        img.src = url;
-                    });
-
+                const downloadQRIS = async () => {
+                    isDownloading.value = true;
                     try {
-                        const img = await loadImage(qrisDisplayUrl.value);
-                        
-                        const cvs = document.createElement("canvas");
-                        cvs.width = img.naturalWidth;
-                        cvs.height = img.naturalHeight;
-                        const ctx = cvs.getContext("2d");
-                        ctx.drawImage(img, 0, 0);
-                        
-                        cvs.toBlob((b) => {
-                            if (!b) throw new Error("Gagal membuat blob");
-                            const u = window.URL.createObjectURL(b);
-                            const a = document.createElement('a');
-                            a.href = u;
-                            a.download = "RUXXI-QRIS.png";
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(u);
-                            showAlert("QRIS Berhasil Disimpan");
-                            isActionLoading.value = false;
-                        }, 'image/png');
+                        const img = new Image();
+                        img.crossOrigin = "anonymous"; // Request CORS access
+                        img.src = qrisUrl.value;
+
+                        img.onload = () => {
+                            const canvas = document.createElement("canvas");
+                            canvas.width = img.naturalWidth;
+                            canvas.height = img.naturalHeight;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0);
+
+                            canvas.toBlob((blob) => {
+                                if (!blob) throw new Error("Processing failed");
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = `RUXXI-QRIS-${Date.now()}.png`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                                showNotification("QRIS Berhasil Diunduh");
+                                isDownloading.value = false;
+                            }, 'image/png');
+                        };
+
+                        img.onerror = () => {
+                            // Emergency Fallback
+                            window.open(qrisUrl.value, '_blank');
+                            showNotification("Gagal Otomatis. Gunakan Save Manual.");
+                            isDownloading.value = false;
+                        };
 
                     } catch (e) {
                         console.error(e);
-                        // Fallback jika fetch dilarang browser atau gagal
-                        window.open(qrisDisplayUrl.value, '_blank');
-                        showAlert("Klik Lama Pada Gambar Untuk Simpan");
-                        isActionLoading.value = false;
+                        window.open(qrisUrl.value, '_blank');
+                        showNotification("Membuka Gambar. Silakan Simpan Manual.");
+                        isDownloading.value = false;
                     }
                 };
 
-                onMounted(() => {
-                    updateClock();
-                    setInterval(updateClock, 1000);
-                });
+                const handleImgError = (e) => {
+                    e.target.src = "https://placehold.co/1000x1000/000000/00f2ff?text=RELOAD+QRIS";
+                };
 
-                return { danaAccount, qrisDisplayUrl, alertMsg, isCopied, isActionLoading, clockTime, copyToClipboard, handleDownload };
+                return { danaNumber, qrisUrl, notification, isCopied, isDownloading, currentTime, copyNumber, downloadQRIS, handleImgError };
             }
         }).mount('#app');
     </script>
@@ -284,6 +279,7 @@
     <style>
         .toast-enter-active, .toast-leave-active { transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .toast-enter-from, .toast-leave-to { opacity: 0; transform: translate(-50%, -100px); }
+        [v-cloak] { display: none; }
     </style>
 </body>
 </html>
