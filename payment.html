@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUXXI | Electric High-Voltage Payment</title>
+    <!-- Frameworks -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Icons & Typography -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --electric-cyan: #00f2ff;
+            --electric-purple: #7000ff;
+            --electric-blue: #0062ff;
+            --bg-dark: #020205;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated Electric Background */
+        .energy-blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.15;
+            animation: drift 15s infinite alternate;
+        }
+
+        @keyframes drift {
+            from { transform: translate(-10%, -10%) rotate(0deg); }
+            to { transform: translate(20%, 20%) rotate(360deg); }
+        }
+
+        /* Electric Glass Panel */
+        .electric-card {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            box-shadow: 
+                0 0 40px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0, 242, 255, 0.05);
+        }
+
+        .electric-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(45deg, var(--electric-cyan), var(--electric-purple), var(--electric-blue));
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0.3;
+        }
+
+        /* Spark Scan Effect */
+        .spark-scanner {
+            width: 100%;
+            height: 3px;
+            background: var(--electric-cyan);
+            position: absolute;
+            z-index: 30;
+            animation: spark-move 3s ease-in-out infinite;
+            box-shadow: 
+                0 0 15px var(--electric-cyan),
+                0 0 30px var(--electric-blue);
+        }
+
+        @keyframes spark-move {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Holographic Button */
+        .btn-electric {
+            background: linear-gradient(135deg, var(--electric-blue), var(--electric-purple));
+            box-shadow: 0 0 25px rgba(112, 0, 255, 0.4);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .btn-electric:hover {
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.6);
+            transform: scale(1.02);
+            filter: brightness(1.2);
+        }
+
+        [v-cloak] { display: none; }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+
+    <div id="app" v-cloak class="w-full max-w-lg relative">
+        <div class="energy-blob bg-cyan-500 top-0 left-0"></div>
+        <div class="energy-blob bg-purple-600 bottom-0 right-0" style="animation-delay: -5s"></div>
+
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center gap-3 mb-6 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-900/20 backdrop-blur-md">
+                <i class="ph-fill ph-lightning text-cyan-400 animate-pulse"></i>
+                <span class="text-[10px] uppercase tracking-[0.4em] font-bold text-cyan-400">High Voltage Payment</span>
+            </div>
+            <h1 class="text-7xl font-bold tracking-tighter mb-2 italic">
+                RUXXI<span class="text-cyan-400">.</span>
+            </h1>
+            <p class="text-gray-400 text-xs font-medium tracking-[0.6em] uppercase opacity-70">Electric Terminal A-01</p>
+        </header>
+
+        <main class="electric-card rounded-[3.5rem] overflow-hidden">
+            <div class="p-10">
+                <!-- QRIS Box -->
+                <div class="relative group mb-14">
+                    <div class="absolute -inset-6 bg-gradient-to-tr from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl opacity-50 transition-opacity group-hover:opacity-100"></div>
+                    <div class="relative bg-white rounded-[2.5rem] p-5 shadow-[0_0_80px_rgba(0,242,255,0.15)] overflow-hidden">
+                        <div class="spark-scanner"></div>
+                        <div class="rounded-[1.8rem] overflow-hidden">
+                            <img 
+                                :src="getDirectQrisUrl()" 
+                                alt="RUXXI QRIS" 
+                                class="w-full aspect-square object-cover"
+                                @error="handleImgError"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Download Trigger -->
+                    <button 
+                        @click="downloadQRIS" 
+                        class="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-white text-black px-10 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(0,0,0,0.5)] flex items-center gap-3 transition-all hover:bg-cyan-400 hover:scale-110 active:scale-95 z-30"
+                    >
+                        <i :class="isDownloading ? 'ph ph-circle-notch animate-spin' : 'ph-fill ph-download-simple'" class="text-lg"></i>
+                        {{ isDownloading ? 'Processing' : 'Simpan QRIS' }}
+                    </button>
+                </div>
+
+                <!-- DANA Focus Section -->
+                <section class="mt-20">
+                    <div class="relative group">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition-all duration-700"></div>
+                        <div class="relative bg-black/40 border border-white/5 rounded-[2.5rem] p-8 flex flex-col items-center">
+                            <div class="mb-4">
+                                <span class="text-[9px] text-cyan-500/60 font-bold uppercase tracking-[0.5em]">Direct Endpoint</span>
+                            </div>
+                            <h2 class="text-5xl font-bold tracking-tighter text-white mb-2 font-mono italic">{{ danaNumber }}</h2>
+                            <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-8">DANA Global Network</p>
+                            <button @click="copyNumber" class="w-full btn-electric text-white py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 active:scale-[0.97]">
+                                <i :class="isCopied ? 'ph-fill ph-check-circle' : 'ph-fill ph-copy'" class="text-xl"></i>
+                                {{ isCopied ? 'Access Granted' : 'Salin Nomor DANA' }}
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- System Metadata -->
+                <div class="mt-12 grid grid-cols-2 gap-4 px-2 opacity-50 font-mono text-[8px] uppercase tracking-tighter">
+                    <div>LOAD: 1.2% / STAT: ENCRYPTED</div>
+                    <div class="text-right">TIME: {{ currentTime }} / AUTH: RUXXI_SEC</div>
+                </div>
+            </div>
+        </main>
+
+        <transition name="electric-toast">
+            <div v-if="notification" class="fixed top-10 left-1/2 -translate-x-1/2 z-[100]">
+                <div class="bg-cyan-500 text-black px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-[0_0_40px_rgba(0,242,255,0.5)] flex items-center gap-3 border border-white/20">
+                    <i class="ph-fill ph-lightning text-base"></i>
+                    {{ notification }}
+                </div>
+            </div>
+        </transition>
+
+        <footer class="mt-14 text-center opacity-40">
+            <p class="text-[9px] text-gray-500 font-bold uppercase tracking-[0.8em]">Verified Electric Asset RUXXI</p>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const gdriveId = "1iY4FdBBX-r6SFUHsOcy9WOsqsHqSV-3I";
+                const danaNumber = ref("0812-2788-0615");
+                const notification = ref(null);
+                const isCopied = ref(false);
+                const isDownloading = ref(false);
+                const currentTime = ref("");
+
+                const getDirectQrisUrl = () => `https://lh3.googleusercontent.com/u/0/d/${gdriveId}=w1000-h1000-iv1`;
+
+                const updateTime = () => {
+                    const now = new Date();
+                    currentTime.value = now.toLocaleTimeString('en-GB', { hour12: false });
+                };
+
+                onMounted(() => {
+                    updateTime();
+                    setInterval(updateTime, 1000);
+                });
+
+                const showNotification = (msg) => {
+                    notification.value = msg;
+                    setTimeout(() => notification.value = null, 3000);
+                };
+
+                const copyNumber = () => {
+                    const cleanNum = danaNumber.value.replace(/\D/g, '');
+                    const el = document.createElement('textarea');
+                    el.value = cleanNum;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    isCopied.value = true;
+                    showNotification("Data Injected to Clipboard");
+                    setTimeout(() => isCopied.value = false, 2000);
+                };
+
+                /**
+                 * Enhanced Download Logic for Ruxxi
+                 * Uses Canvas Rendering to force binary download instead of opening image.
+                 */
+                const downloadQRIS = async () => {
+                    isDownloading.value = true;
+                    const imageUrl = getDirectQrisUrl();
+
+                    try {
+                        // Create image object to fetch pixels
+                        const img = new Image();
+                        img.crossOrigin = "anonymous"; // Request CORS access
+                        img.src = imageUrl;
+
+                        img.onload = () => {
+                            // Create off-screen canvas
+                            const canvas = document.createElement("canvas");
+                            canvas.width = img.naturalWidth;
+                            canvas.height = img.naturalHeight;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0);
+
+                            // Convert canvas to Blob (Binary Large Object)
+                            canvas.toBlob((blob) => {
+                                if (!blob) {
+                                    showNotification("Gagal memproses file.");
+                                    isDownloading.value = false;
+                                    return;
+                                }
+                                
+                                // Create local download link
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = "RUXXI-ELECTRIC-QRIS.png";
+                                document.body.appendChild(link);
+                                link.click();
+                                
+                                // Cleanup
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                                
+                                showNotification("QRIS Berhasil Diunduh");
+                                isDownloading.value = false;
+                            }, 'image/png');
+                        };
+
+                        img.onerror = () => {
+                            showNotification("Gagal memuat gambar. Gunakan Save Manual.");
+                            isDownloading.value = false;
+                        };
+
+                    } catch (e) {
+                        console.error("Download Error:", e);
+                        showNotification("Error: Keamanan Browser.");
+                        isDownloading.value = false;
+                    }
+                };
+
+                const handleImgError = (e) => {
+                    e.target.src = "https://placehold.co/1000x1000/000000/00f2ff?text=RUXXI+POWER";
+                };
+
+                return { danaNumber, notification, isCopied, isDownloading, currentTime, getDirectQrisUrl, copyNumber, downloadQRIS, handleImgError };
+            }
+        }).mount('#app');
+    </script>
+
+    <style>
+        .electric-toast-enter-active, .electric-toast-leave-active { transition: all 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6); }
+        .electric-toast-enter-from, .electric-toast-leave-to { opacity: 0; transform: translate(-50%, -100px); }
+    </style>
+</body>
+</html>
