@@ -3,301 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUXX PAY - Cosmic AI</title>
+    <title>RUXX PAY - Supernova AI</title>
     <!-- Core Stack -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
         [v-cloak] { display: none; }
         :root {
-            --primary: #818cf8;
-            --secondary: #c084fc;
-            --accent: #fb7185;
-            --bg: #020617;
+            --neon-blue: #60a5fa;
+            --neon-purple: #a855f7;
+            --neon-rose: #fb7185;
         }
 
         body { 
             font-family: 'Space Grotesk', sans-serif; 
-            background-color: var(--bg);
+            background-color: #000;
             color: white;
             overflow-x: hidden;
+            margin: 0;
         }
 
-        /* Interactive Cosmic Background */
-        .cosmic-bg {
+        #canvas-container {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        /* Glassmorphism Ultra */
+        .glass-vault {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .neon-border {
+            position: relative;
             overflow: hidden;
         }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: twinkle var(--duration) infinite alternate;
-        }
-
-        @keyframes twinkle {
-            from { opacity: 0.2; transform: scale(1); }
-            to { opacity: 0.8; transform: scale(1.5); }
-        }
-
-        .nebula {
-            position: absolute;
-            width: 800px;
-            height: 800px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.15;
-            animation: nebulaMove 30s infinite alternate;
-        }
-
-        @keyframes nebulaMove {
-            0% { transform: translate(-10%, -10%) scale(1); }
-            100% { transform: translate(10%, 10%) scale(1.2); }
-        }
-
-        /* Galactic Glass Cards */
-        .galactic-card {
-            position: relative;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255,255,255,0.02);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .galactic-card:hover {
-            border-color: rgba(129, 140, 248, 0.4);
-            transform: translateY(-5px);
-            box-shadow: 0 0 60px rgba(129, 140, 248, 0.15);
-        }
-
-        /* Energy Border Effect */
-        .energy-border {
-            position: relative;
-        }
-        .energy-border::before {
+        
+        .neon-border::before {
             content: '';
             position: absolute;
-            inset: -1px;
-            background: linear-gradient(45deg, transparent, rgba(129, 140, 248, 0.3), transparent);
-            border-radius: inherit;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--neon-blue), transparent, var(--neon-purple), transparent);
+            animation: rotate-border 6s linear infinite;
             z-index: -1;
-            animation: energyFlow 4s linear infinite;
         }
 
-        @keyframes energyFlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
+        @keyframes rotate-border {
+            100% { transform: rotate(360deg); }
         }
 
-        /* AI Orbit Visual */
-        .orbit {
-            position: absolute;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            animation: rotate 20s linear infinite;
+        .content-inner {
+            background: #050505;
+            margin: 2px;
+            border-radius: inherit;
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        /* AI Chat Bubble Customization */
+        .chat-scroll::-webkit-scrollbar { width: 4px; }
+        .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .ai-msg {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border-left: 3px solid var(--neon-blue);
         }
 
-        .font-mono-pay { font-family: 'JetBrains Mono', monospace; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(129, 140, 248, 0.3); border-radius: 10px; }
+        .user-msg {
+            background: linear-gradient(135deg, var(--neon-purple) 0%, #6366f1 100%);
+            box-shadow: 0 10px 20px -10px var(--neon-purple);
+        }
     </style>
 </head>
-<body class="selection:bg-indigo-500/50">
+<body class="selection:bg-indigo-500/30">
 
-    <div class="cosmic-bg">
-        <!-- Stars generated by JS -->
-        <div id="stars"></div>
-        <div class="nebula" style="top: -20%; left: -20%; background: var(--primary);"></div>
-        <div class="nebula" style="bottom: -20%; right: -20%; background: var(--secondary); animation-delay: -5s;"></div>
-    </div>
+    <div id="canvas-container"></div>
 
-    <div id="app" v-cloak class="max-w-3xl mx-auto min-h-screen p-6 pb-24 flex flex-col relative">
+    <div id="app" v-cloak class="max-w-4xl mx-auto min-h-screen p-6 pb-24 flex flex-col relative z-10">
         
-        <!-- Header: Cosmic Portal -->
-        <header class="py-20 text-center relative animate-in fade-in duration-1000">
-            <div class="relative inline-block mb-10 group">
-                <!-- Orbit Decorations -->
-                <div class="orbit w-40 h-40 -top-8 -left-8 border-indigo-500/20" style="animation-duration: 15s"></div>
-                <div class="orbit w-32 h-32 -top-4 -left-4 border-purple-500/20" style="animation-duration: 25s; animation-direction: reverse;"></div>
-                
-                <div class="absolute inset-0 bg-indigo-500 blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <div class="relative w-24 h-24 bg-gradient-to-tr from-indigo-900 via-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-[0_0_80px_rgba(79,70,229,0.5)] border border-white/20">
-                    <i class="ph-fill ph-planet text-6xl text-white animate-pulse"></i>
-                </div>
+        <!-- Animated Header -->
+        <header class="py-16 text-center animate-in fade-in zoom-in duration-1000">
+            <div class="relative inline-block mb-6">
+                <div class="absolute inset-0 bg-blue-500 blur-[60px] opacity-20 animate-pulse"></div>
+                <h1 class="text-7xl font-black italic tracking-tighter uppercase leading-none bg-clip-text text-transparent bg-gradient-to-b from-white via-slate-300 to-slate-600">
+                    RUXX<span class="text-blue-400">PAY</span>
+                </h1>
             </div>
-            
-            <h1 class="text-7xl font-black italic tracking-tighter uppercase mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-slate-600">
-                RUXX<span class="text-indigo-400">PAY</span>
-            </h1>
-            <div class="flex items-center justify-center gap-4">
-                <div class="h-0.5 w-12 bg-gradient-to-r from-transparent to-indigo-500"></div>
-                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-[1.2em]">Cosmic Edition</p>
-                <div class="h-0.5 w-12 bg-gradient-to-l from-transparent to-indigo-500"></div>
-            </div>
+            <p class="text-[10px] font-bold text-blue-300 uppercase tracking-[1em] opacity-60">Quantum Encryption Layer</p>
         </header>
 
-        <!-- Payment Hub -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24">
+        <!-- Main Display Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20">
             
-            <!-- QRIS GALACTIC MODULE -->
-            <section class="space-y-6 group animate-in fade-in slide-in-from-left duration-1000">
-                <div class="flex items-center gap-3 px-6">
-                    <span class="relative flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
-                    </span>
-                    <h2 class="text-xs font-black uppercase tracking-widest text-slate-400">QRIS Satellite Link</h2>
+            <!-- QRIS CARD -->
+            <section class="space-y-6 animate-in fade-in slide-in-from-left duration-1000">
+                <div class="flex items-center gap-3 px-4">
+                    <i class="ph-fill ph-qr-code text-rose-400 text-2xl"></i>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-slate-400">QRIS Uplink</h2>
                 </div>
                 
-                <div class="galactic-card rounded-[4rem] p-10 text-center space-y-8 energy-border">
-                    <div class="relative">
-                        <div class="absolute -inset-10 bg-rose-500/10 blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <div class="relative bg-white p-5 rounded-[2.5rem] shadow-2xl transition-all duration-700 group-hover:scale-105 group-hover:rotate-1">
-                            <img :src="config.qrisUrl" class="w-full aspect-square object-contain rounded-xl">
+                <div class="neon-border rounded-[3.5rem] p-0 shadow-2xl">
+                    <div class="content-inner p-10 text-center space-y-8 rounded-[3.5rem]">
+                        <div class="relative inline-block bg-white p-4 rounded-3xl group cursor-pointer overflow-hidden">
+                            <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                            <img :src="config.qrisUrl" alt="QRIS" class="w-64 h-64 object-contain rounded-xl transition-transform duration-700 group-hover:scale-110">
                         </div>
+                        <button @click="downloadQR" class="w-full py-5 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-slate-200 transition-all active:scale-95">
+                            <i class="ph-bold ph-download-simple text-xl"></i>
+                            Download QR Asset
+                        </button>
                     </div>
-                    
-                    <button @click="downloadQR" class="w-full py-5 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-slate-100 hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] active:scale-95 transition-all">
-                        <i class="ph-bold ph-rocket-launch text-xl"></i>
-                        Eject QR Asset
-                    </button>
                 </div>
             </section>
 
-            <!-- DANA QUANTUM PROTOCOL -->
-            <section class="space-y-6 group animate-in fade-in slide-in-from-right duration-1000">
-                <div class="flex items-center gap-3 px-6">
-                    <span class="relative flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                    </span>
-                    <h2 class="text-xs font-black uppercase tracking-widest text-slate-400">DANA Quantum Node</h2>
+            <!-- DANA CARD -->
+            <section class="space-y-6 animate-in fade-in slide-in-from-right duration-1000">
+                <div class="flex items-center gap-3 px-4">
+                    <i class="ph-fill ph-wallet text-blue-400 text-2xl"></i>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-slate-400">DANA Node</h2>
                 </div>
 
-                <div class="galactic-card rounded-[4rem] p-12 space-y-12 relative overflow-hidden energy-border">
-                    <div class="space-y-6 relative z-10">
-                        <div class="text-left space-y-2">
-                            <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Network Address</p>
-                            <h3 class="text-4xl font-mono-pay tracking-tight text-white group-hover:text-blue-400 transition-colors duration-500">
+                <div class="neon-border rounded-[3.5rem] p-0 shadow-2xl">
+                    <div class="content-inner p-10 space-y-12 rounded-[3.5rem] relative overflow-hidden">
+                        <div class="space-y-2 relative z-10 text-left">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Target Address</p>
+                            <h3 class="text-4xl font-black tracking-widest text-blue-400 leading-none">
                                 {{ config.danaNumber }}
                             </h3>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                                <i class="ph-bold ph-identification-badge text-blue-400"></i>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase">Account Holder</p>
-                                <p class="text-sm font-black text-slate-200 uppercase tracking-widest">{{ config.danaName }}</p>
+                            <div class="pt-4">
+                                <span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
+                                    A/N {{ config.danaName }}
+                                </span>
                             </div>
                         </div>
-                    </div>
 
-                    <button @click="copy(config.danaNumber)" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:shadow-[0_0_40px_rgba(37,99,235,0.4)] active:scale-95 transition-all relative z-10">
-                        <i class="ph-bold ph-lightning text-xl"></i>
-                        Link To Protocol
-                    </button>
+                        <button @click="copy(config.danaNumber)" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-600/30">
+                            <i class="ph-bold ph-copy-simple text-xl"></i>
+                            Copy Endpoint
+                        </button>
+                    </div>
                 </div>
             </section>
         </div>
 
-        <!-- COSMIC AI COMMAND CENTER -->
-        <section class="flex-1 flex flex-col space-y-8 animate-in fade-in duration-1000 delay-300">
+        <!-- AI COMMAND CENTER (DIPERBAIKI) -->
+        <section class="flex-1 flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom duration-1000 delay-300">
             <div class="flex items-center justify-between px-6">
                 <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="absolute -inset-2 bg-indigo-500/30 blur-lg rounded-full animate-pulse"></div>
-                        <i class="ph-fill ph-brain text-indigo-400 text-2xl relative"></i>
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.5)]">
+                        <i class="ph-fill ph-robot text-2xl"></i>
                     </div>
-                    <h2 class="text-[11px] font-black uppercase tracking-widest text-slate-200">Cosmic AI Intelligence</h2>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic">Signal Stable</span>
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-widest leading-none">RUXX Core AI</h2>
+                        <span class="text-[9px] font-bold text-green-500 uppercase tracking-widest flex items-center gap-1 mt-1">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                            Neural Link Active
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div class="galactic-card rounded-[3.5rem] flex-1 flex flex-col overflow-hidden min-h-[550px]">
-                <!-- Chat Feed -->
-                <div ref="chatContainer" class="flex-1 overflow-y-auto p-10 space-y-8 scroll-smooth">
+            <div class="glass-vault rounded-[3rem] flex-1 flex flex-col overflow-hidden min-h-[500px] border-white/5">
+                <!-- Chat View -->
+                <div ref="chatContainer" class="flex-1 overflow-y-auto p-8 space-y-6 chat-scroll">
                     <div v-for="(msg, i) in chat.messages" :key="i" 
                         :class="msg.role === 'user' ? 'flex flex-row-reverse' : 'flex flex-row'"
-                        class="animate-in fade-in zoom-in duration-500"
+                        class="animate-in fade-in slide-in-from-bottom-2 duration-300"
                     >
-                        <div 
-                            :class="msg.role === 'user' ? 'bg-indigo-600/80 rounded-tr-none text-white' : 'bg-slate-800/40 border border-white/5 rounded-tl-none text-slate-300'" 
-                            class="max-w-[85%] px-8 py-5 rounded-[2rem] shadow-2xl backdrop-blur-md"
-                        >
+                        <div :class="msg.role === 'user' ? 'user-msg rounded-tr-none' : 'ai-msg rounded-tl-none text-slate-100'" 
+                             class="max-w-[85%] px-6 py-4 rounded-[1.5rem] shadow-xl">
                             <p class="text-sm font-medium leading-relaxed tracking-wide italic">{{ msg.text }}</p>
                         </div>
                     </div>
-                    <!-- AI Thinking Indicator -->
+                    <!-- Typing Indicator -->
                     <div v-if="chat.isTyping" class="flex flex-row">
-                        <div class="bg-slate-800/40 border border-white/5 px-8 py-5 rounded-[2rem] rounded-tl-none flex items-center gap-2">
-                            <span class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0s"></span>
-                            <span class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                            <span class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
+                        <div class="ai-msg px-6 py-4 rounded-[1.5rem] rounded-tl-none flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                            <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                            <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Input Module -->
-                <div class="p-8 bg-white/5 border-t border-white/10 flex gap-5">
+                <!-- Input Panel -->
+                <div class="p-6 bg-black/40 border-t border-white/5 flex gap-4">
                     <input 
                         v-model="chat.userInput" 
                         @keyup.enter="sendMessage"
                         type="text" 
-                        placeholder="Kirim perintah ke pusat data..." 
-                        class="flex-1 bg-black/40 border border-white/10 rounded-3xl px-8 py-5 text-sm font-medium outline-none focus:border-indigo-400 focus:bg-black/60 transition-all placeholder:text-slate-600"
+                        placeholder="Masukkan perintah atau pertanyaan..." 
+                        class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs font-medium outline-none focus:border-blue-500 focus:bg-white/10 transition-all placeholder:text-slate-600"
                     >
                     <button 
                         @click="sendMessage" 
                         :disabled="!chat.userInput || chat.isTyping"
-                        class="w-16 h-16 bg-indigo-600 text-white rounded-3xl flex items-center justify-center hover:bg-indigo-500 hover:shadow-[0_0_30px_rgba(79,70,229,0.4)] active:scale-90 transition-all disabled:opacity-20"
+                        class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center hover:bg-indigo-500 active:scale-90 transition-all disabled:opacity-30 shadow-lg shadow-indigo-600/20"
                     >
-                        <i class="ph-bold ph-paper-plane text-2xl"></i>
+                        <i class="ph-bold ph-paper-plane-right text-2xl"></i>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- Cosmic Footer -->
-        <footer class="py-24 text-center space-y-8">
-            <div class="flex items-center justify-center gap-10 opacity-20">
-                <i class="ph-bold ph-atom text-4xl"></i>
-                <i class="ph-bold ph-broadcast text-4xl"></i>
-                <i class="ph-bold ph-dna text-4xl"></i>
-            </div>
-            <p class="text-[10px] font-black text-slate-800 uppercase tracking-[1.5em]">Trans-Galactic Payment Protocol</p>
-        </footer>
-
-        <!-- Cosmic Toast -->
-        <transition name="cosmic-toast">
-            <div v-if="toast.show" class="fixed bottom-12 left-0 right-0 z-[100] flex justify-center px-6">
-                <div class="bg-white text-black px-10 py-6 rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,1)] flex items-center gap-6 border border-white/20">
-                    <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl rotate-12">
+        <!-- Toast -->
+        <transition name="toast">
+            <div v-if="toast.show" class="fixed top-10 left-0 right-0 z-[100] flex justify-center px-6">
+                <div class="bg-white text-black px-8 py-5 rounded-[2rem] shadow-2xl flex items-center gap-4">
+                    <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white">
                         <i class="ph-fill ph-check-circle text-2xl"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Status Update</span>
-                        <span class="text-sm font-black uppercase tracking-tight">{{ toast.msg }}</span>
+                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Sistem</span>
+                        <span class="text-[12px] font-black uppercase tracking-tight">{{ toast.msg }}</span>
                     </div>
                 </div>
             </div>
@@ -323,9 +251,52 @@
                     userInput: '',
                     isTyping: false,
                     messages: [
-                        { role: 'assistant', text: 'Halo Komandan. Sistem RUXX Cosmic AI telah tersinkronisasi. Bagaimana saya bisa mengarahkan pembayaran Anda hari ini?' }
+                        { role: 'assistant', text: 'Sistem Pusat RUXX PAY Aktif. Bagaimana saya dapat memandu transaksi Anda hari ini, Komandan?' }
                     ]
                 });
+
+                // THREE.JS SPACE ENGINE
+                const initSpace = () => {
+                    const scene = new THREE.Scene();
+                    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+                    const geometry = new THREE.BufferGeometry();
+                    const vertices = [];
+                    for (let i = 0; i < 5000; i++) {
+                        vertices.push(THREE.MathUtils.randFloatSpread(2000), THREE.MathUtils.randFloatSpread(2000), THREE.MathUtils.randFloatSpread(2000));
+                    }
+                    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                    const material = new THREE.PointsMaterial({ color: 0xffffff, size: 2, transparent: true, opacity: 0.8 });
+                    const stars = new THREE.Points(geometry, material);
+                    scene.add(stars);
+
+                    camera.position.z = 1;
+
+                    let mouseX = 0, mouseY = 0;
+                    document.addEventListener('mousemove', (e) => {
+                        mouseX = (e.clientX - window.innerWidth / 2) * 0.05;
+                        mouseY = (e.clientY - window.innerHeight / 2) * 0.05;
+                    });
+
+                    const animate = () => {
+                        requestAnimationFrame(animate);
+                        stars.rotation.x += 0.0005;
+                        stars.rotation.y += 0.0005;
+                        camera.position.x += (mouseX - camera.position.x) * 0.05;
+                        camera.position.y += (-mouseY - camera.position.y) * 0.05;
+                        renderer.render(scene, camera);
+                    };
+                    animate();
+
+                    window.addEventListener('resize', () => {
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                    });
+                };
 
                 const showToast = (msg) => {
                     toast.value.msg = msg;
@@ -335,18 +306,16 @@
 
                 const copy = (txt) => {
                     const el = document.createElement('textarea');
-                    el.value = txt; 
-                    document.body.appendChild(el);
-                    el.select(); 
-                    document.execCommand('copy');
+                    el.value = txt; document.body.appendChild(el);
+                    el.select(); document.execCommand('copy');
                     document.body.removeChild(el);
-                    showToast("Nomor Berhasil Disalin");
+                    showToast("Saluran Salin Berhasil");
                 };
 
                 const downloadQR = () => {
                     const a = document.createElement('a');
                     a.href = config.value.qrisUrl;
-                    a.download = 'RUXX-COSMIC-QRIS.jpg';
+                    a.download = 'RUXX-QRIS-NODE.jpg';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -360,48 +329,35 @@
                     }
                 };
 
-                // GENERATE STARS
-                onMounted(() => {
-                    const starContainer = document.getElementById('stars');
-                    for (let i = 0; i < 200; i++) {
-                        const star = document.createElement('div');
-                        star.className = 'star';
-                        star.style.left = `${Math.random() * 100}%`;
-                        star.style.top = `${Math.random() * 100}%`;
-                        const size = Math.random() * 3;
-                        star.style.width = `${size}px`;
-                        star.style.height = `${size}px`;
-                        star.style.setProperty('--duration', `${2 + Math.random() * 4}s`);
-                        starContainer.appendChild(star);
-                    }
-                });
-
-                const apiKey = "AIzaSyDnEVtoDpknDlUFkw4pPpe_lh0_z0YZ4As"; // API Key provided by runtime
+                // GEMINI INTEGRATION WITH BACKOFF
+                const apiKey = "AIzaSyDnEVtoDpknDlUFkw4pPpe_lh0_z0YZ4As"; 
                 const callGemini = async (prompt) => {
                     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                    const systemPrompt = `Anda adalah RUXX Cosmic AI, asisten pembayaran antar galaksi yang paling canggih. 
-                    Detail Bisnis: Gateway 'RUXX PAY', DANA ${config.value.danaNumber} a/n ${config.value.danaName}, QRIS All Payment. 
-                    Gaya Bicara: Futuristik, tenang, seperti asisten pesawat luar angkasa tingkat lanjut. Gunakan istilah seperti 'Sinkronisasi', 'Protokol', 'Koordinat', dll.`;
+                    const systemPrompt = `Anda adalah RUXX Supernova AI. 
+                    Detail: Gateway 'RUXX PAY', DANA ${config.value.danaNumber} a/n ${config.value.danaName}, QRIS All Payment. 
+                    Karakter: Futuristik, cerdas, efisien. Gunakan istilah seperti 'Uplink', 'Node', 'Protokol Enkripsi'. Jawab singkat dan padat.`;
 
+                    const delays = [1000, 2000, 4000, 8000, 16000];
                     const payload = {
                         contents: [{ parts: [{ text: prompt }] }],
                         systemInstruction: { parts: [{ text: systemPrompt }] }
                     };
 
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i <= delays.length; i++) {
                         try {
                             const res = await fetch(url, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(payload)
                             });
+                            if (!res.ok) throw new Error("API Error");
                             const result = await res.json();
-                            return result.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf Komandan, transmisi terganggu.";
+                            return result.candidates?.[0]?.content?.parts?.[0]?.text || "Sinkronisasi gagal.";
                         } catch (e) {
-                            await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                            if (i === delays.length) return "Koneksi Neural Terputus. Silakan coba lagi nanti.";
+                            await new Promise(r => setTimeout(r, delays[i]));
                         }
                     }
-                    return "Maaf, kehilangan sinyal satelit.";
                 };
 
                 const sendMessage = async () => {
@@ -413,11 +369,20 @@
                     chat.value.isTyping = true;
                     await scrollToBottom();
 
-                    const response = await callGemini(userText);
-                    chat.value.isTyping = false;
-                    chat.value.messages.push({ role: 'assistant', text: response });
-                    await scrollToBottom();
+                    try {
+                        const response = await callGemini(userText);
+                        chat.value.messages.push({ role: 'assistant', text: response });
+                    } catch (e) {
+                        chat.value.messages.push({ role: 'assistant', text: "Terjadi gangguan pada protokol AI." });
+                    } finally {
+                        chat.value.isTyping = false;
+                        await scrollToBottom();
+                    }
                 };
+
+                onMounted(() => {
+                    window.onload = initSpace;
+                });
 
                 return { config, toast, chat, chatContainer, copy, downloadQR, sendMessage };
             }
@@ -425,13 +390,13 @@
     </script>
 
     <style>
-        /* Cosmic Toast Animation */
-        .cosmic-toast-enter-active { animation: cosmicToastIn 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
-        .cosmic-toast-leave-active { animation: cosmicToastIn 0.4s reverse ease-in; }
+        /* Toast Animation */
+        .toast-enter-active { animation: toastSlideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .toast-leave-active { animation: toastSlideIn 0.4s reverse ease-in; }
         
-        @keyframes cosmicToastIn {
-            0% { transform: translateY(200%) rotate(5deg); opacity: 0; }
-            100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        @keyframes toastSlideIn {
+            0% { transform: translateY(-100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
     </style>
 </body>
