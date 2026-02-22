@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RUXX PAY - Zenith Audio Edition</title>
+    <title>RUXX PAY - Zenith Sora Nora Edition</title>
     <!-- Framework & Library Utama -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -94,9 +94,9 @@
             </button>
         </div>
 
-        <!-- Hidden Audio Element -->
+        <!-- Hidden Audio Element - Sora Nora Vibe Track -->
         <audio id="bg-audio" loop preload="auto">
-            <source src="https://cdn.pixabay.com/audio/2022/01/21/audio_31b3484294.mp3" type="audio/mpeg">
+            <source src="https://cdn.pixabay.com/audio/2023/10/24/audio_9855325c17.mp3" type="audio/mpeg">
         </audio>
 
         <!-- Tajuk Resmi -->
@@ -353,9 +353,6 @@
                     // Audio Autoplay Handler on first interaction
                     const handleFirstInteraction = () => {
                         const audio = document.getElementById('bg-audio');
-                        // Optional: Un-comment below to autoplay on first click anywhere
-                        // audio.play();
-                        // musicActive.value = true;
                         document.removeEventListener('click', handleFirstInteraction);
                     };
                     document.addEventListener('click', handleFirstInteraction);
