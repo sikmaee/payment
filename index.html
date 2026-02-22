@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RUXX PAY - Zenith Sora Nora Edition</title>
-    <!-- Framework & Library Utama -->
+    <title>RUXX PAY - Zenith Ultra Edition</title>
+    <!-- Framework & External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -37,7 +37,7 @@
             z-index: -1;
         }
 
-        /* Arsitektur Glassmorphism Zenith */
+        /* Zenith Glassmorphism Architecture */
         .glass-container {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(30px) saturate(150%);
@@ -51,7 +51,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Custom Scrollbar Korporat */
+        /* Corporate Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--zenith-indigo); border-radius: 10px; }
 
@@ -67,7 +67,7 @@
             font-weight: 800;
         }
 
-        /* Audio Control Animation */
+        /* Audio Pulse Animation */
         .audio-pulse {
             animation: pulse-audio 2s infinite;
         }
@@ -75,6 +75,12 @@
             0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
             100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+
+        /* Video Container Glow */
+        .video-glow {
+            box-shadow: 0 0 40px rgba(14, 165, 233, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
     </style>
 </head>
@@ -85,7 +91,7 @@
 
     <div id="app" v-cloak class="max-w-2xl mx-auto min-h-screen p-4 sm:p-6 pb-24 flex flex-col relative z-10">
         
-        <!-- Audio Control Floating Button -->
+        <!-- Kontrol Audio Mengambang -->
         <div class="fixed top-6 right-6 z-[60]">
             <button @click="toggleMusic" 
                 class="w-12 h-12 flex items-center justify-center rounded-2xl glass-container border-white/10 text-white transition-all active:scale-90"
@@ -94,21 +100,39 @@
             </button>
         </div>
 
-        <!-- Hidden Audio Element - Sora Nora Vibe Track -->
+        <!-- Elemen Audio - Tautan Baru yang Lebih Stabil untuk Android -->
         <audio id="bg-audio" loop preload="auto">
-            <source src="https://cdn.pixabay.com/audio/2023/10/24/audio_9855325c17.mp3" type="audio/mpeg">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
         </audio>
 
-        <!-- Tajuk Resmi -->
-        <header class="py-12 sm:py-20 text-center animate-in fade-in duration-1000">
+        <!-- Tajuk Utama -->
+        <header class="py-12 sm:py-20 text-center animate-in fade-in duration-1000 flex flex-col items-center">
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/50 mb-6 shadow-2xl">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">Gateway Terenkripsi</span>
+                <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">Zenith Enterprise System</span>
             </div>
-            <h1 class="text-6xl sm:text-8xl font-black italic tracking-tighter uppercase leading-none gradient-text" style="font-family: 'Space Grotesk', sans-serif;">
+            
+            <h1 class="text-6xl sm:text-8xl font-black italic tracking-tighter uppercase leading-none gradient-text mb-10" style="font-family: 'Space Grotesk', sans-serif;">
                 RUXX<span class="text-sky-500">PAY</span>
             </h1>
-            <p class="mt-4 text-[10px] sm:text-[11px] font-medium text-slate-500 uppercase tracking-[1em]">Portal Pembayaran Digital</p>
+
+            <!-- Bagian Animasi Video -->
+            <div class="mb-10 px-4 w-full flex justify-center">
+                <div class="video-glow relative rounded-[2.5rem] overflow-hidden bg-slate-900/40 aspect-video w-full max-w-[420px]">
+                    <video 
+                        autoplay 
+                        loop 
+                        muted 
+                        playsinline 
+                        class="w-full h-full object-cover">
+                        <source src="https://raw.githubusercontent.com/IkyyExecutive/IkyyBokep/main/uploads/1771800742244_68558_1771800741335_file_652.mp4" type="video/mp4">
+                    </video>
+                    <!-- Overlay Glass Efek -->
+                    <div class="absolute inset-0 pointer-events-none ring-1 ring-inset ring-white/10 rounded-[2.5rem]"></div>
+                </div>
+            </div>
+
+            <p class="text-[10px] sm:text-[11px] font-medium text-slate-500 uppercase tracking-[1em]">Gerbang Pembayaran Eksklusif</p>
         </header>
 
         <!-- Modul Pembayaran Utama -->
@@ -121,7 +145,7 @@
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Metode QRIS All Payment</h2>
                 </div>
                 
-                <div class="glass-container rounded-[2.5rem] p-6 sm:p-10 flex flex-col items-center space-y-8 group">
+                <div class="glass-container rounded-[2.5rem] p-6 sm:p-10 flex flex-col items-center space-y-8 group transition-all duration-500 hover:border-sky-500/20">
                     <div class="relative bg-white p-4 sm:p-6 rounded-[2rem] shadow-2xl">
                         <img :src="config.qrisUrl" alt="RUXX QRIS" class="w-56 h-56 sm:w-64 sm:h-64 object-contain rounded-xl">
                     </div>
@@ -141,7 +165,7 @@
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Metode Transfer DANA</h2>
                 </div>
 
-                <div class="glass-container rounded-[2.5rem] p-8 sm:p-10 flex flex-col justify-center space-y-8 relative overflow-hidden">
+                <div class="glass-container rounded-[2.5rem] p-8 sm:p-10 flex flex-col justify-center space-y-8 relative overflow-hidden transition-all duration-500 hover:border-indigo-500/20">
                     <div class="space-y-4 relative z-10 text-left">
                         <div>
                             <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nomor Rekening Tujuan</p>
@@ -169,44 +193,36 @@
             <section class="space-y-4 animate-in fade-in duration-1000">
                 <div class="flex items-center gap-3 px-4">
                     <i class="ph-fill ph-info text-emerald-400 text-xl"></i>
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Panduan Pembayaran</h2>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Panduan Pembayaran Resmi</h2>
                 </div>
 
                 <div class="glass-container rounded-[2.5rem] p-8 sm:p-10 space-y-8">
                     <!-- QRIS Steps -->
                     <div class="space-y-4">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-sky-500 border-b border-sky-500/20 pb-2">Melalui QRIS</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-sky-500 border-b border-sky-500/20 pb-2">Melalui Protokol QRIS</p>
                         <ul class="space-y-3">
                             <li class="flex gap-4 items-start">
                                 <span class="step-number mt-0.5">1</span>
-                                <p class="text-xs text-slate-300 leading-relaxed">Unduh atau tangkap layar (screenshot) kode QR di atas.</p>
+                                <p class="text-xs text-slate-300 leading-relaxed">Unduh kode QR atau lakukan tangkapan layar (screenshot) pada kode di atas.</p>
                             </li>
                             <li class="flex gap-4 items-start">
                                 <span class="step-number mt-0.5">2</span>
-                                <p class="text-xs text-slate-300 leading-relaxed">Buka aplikasi E-Wallet (DANA, OVO, GoPay) atau Mobile Banking Anda.</p>
-                            </li>
-                            <li class="flex gap-4 items-start">
-                                <span class="step-number mt-0.5">3</span>
-                                <p class="text-xs text-slate-300 leading-relaxed">Pilih menu "Scan" atau "Bayar" dan unggah gambar kode QR dari galeri.</p>
+                                <p class="text-xs text-slate-300 leading-relaxed">Gunakan fitur pemindaian pada aplikasi dompet digital atau perbankan Anda.</p>
                             </li>
                         </ul>
                     </div>
 
                     <!-- DANA Steps -->
                     <div class="space-y-4">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-indigo-500 border-b border-indigo-500/20 pb-2">Melalui DANA Transfer</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-indigo-500 border-b border-indigo-500/20 pb-2">Melalui Transfer DANA</p>
                         <ul class="space-y-3">
                             <li class="flex gap-4 items-start">
                                 <span class="step-number mt-0.5">1</span>
-                                <p class="text-xs text-slate-300 leading-relaxed">Salin nomor rekening tujuan yang tertera di atas.</p>
+                                <p class="text-xs text-slate-300 leading-relaxed">Salin nomor rekening tujuan resmi yang tertera pada modul di atas.</p>
                             </li>
                             <li class="flex gap-4 items-start">
                                 <span class="step-number mt-0.5">2</span>
-                                <p class="text-xs text-slate-300 leading-relaxed">Buka aplikasi DANA dan pilih menu "Kirim".</p>
-                            </li>
-                            <li class="flex gap-4 items-start">
-                                <span class="step-number mt-0.5">3</span>
-                                <p class="text-xs text-slate-300 leading-relaxed">Tempel nomor dan pastikan nama penerima sesuai sebelum mengonfirmasi.</p>
+                                <p class="text-xs text-slate-300 leading-relaxed">Selesaikan pengiriman dana melalui aplikasi DANA dan simpan bukti transaksi.</p>
                             </li>
                         </ul>
                     </div>
@@ -215,19 +231,19 @@
         </div>
 
         <!-- Kaki Halaman -->
-        <footer class="py-12 text-center space-y-6 opacity-40">
+        <footer class="py-12 text-center space-y-4 opacity-40">
             <p class="text-[9px] font-bold uppercase tracking-[1em] text-slate-500">RUXX Enterprise &bull; 2024</p>
         </footer>
 
         <!-- Notifikasi Toast Zenith -->
         <transition name="toast">
             <div v-if="toast.show" class="fixed top-10 left-0 right-0 z-[100] flex justify-center px-6">
-                <div class="bg-white text-slate-900 px-8 py-4 rounded-[2rem] shadow-2xl flex items-center gap-4">
+                <div class="bg-white text-slate-900 px-8 py-4 rounded-[2rem] shadow-2xl flex items-center gap-4 border-2 border-slate-900">
                     <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-xl">
-                        <i class="ph-fill ph-check-circle text-xl"></i>
+                        <i class="ph-fill ph-info text-xl"></i>
                     </div>
-                    <div class="flex flex-col">
-                        <span class="text-[9px] font-bold uppercase text-slate-400 tracking-widest leading-none">Status</span>
+                    <div class="flex flex-col text-left">
+                        <span class="text-[9px] font-bold uppercase text-slate-400 tracking-widest leading-none">Status Sistem</span>
                         <span class="text-xs font-bold uppercase tracking-tight mt-1">{{ toast.msg }}</span>
                     </div>
                 </div>
@@ -237,7 +253,7 @@
     </div>
 
     <script>
-        const { createApp, ref, onMounted } = Vue;
+        const { createApp, ref, onMounted, nextTick } = Vue;
 
         createApp({
             setup() {
@@ -290,7 +306,7 @@
                     };
 
                     document.addEventListener('mousemove', handleMove);
-                    document.addEventListener('touchmove', handleMove);
+                    document.addEventListener('touchmove', handleMove, { passive: true });
 
                     const animate = () => {
                         requestAnimationFrame(animate);
@@ -317,10 +333,16 @@
 
                 const copy = (txt) => {
                     const el = document.createElement('textarea');
-                    el.value = txt; document.body.appendChild(el);
-                    el.select(); document.execCommand('copy');
+                    el.value = txt; 
+                    document.body.appendChild(el);
+                    el.select(); 
+                    try {
+                        document.execCommand('copy');
+                        showToast("Nomor Berhasil Disalin");
+                    } catch (err) {
+                        showToast("Gagal menyalin nomor");
+                    }
                     document.body.removeChild(el);
-                    showToast("Nomor Berhasil Disalin");
                 };
 
                 const downloadQR = () => {
@@ -331,31 +353,34 @@
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    showToast("Membuka Gambar...");
+                    showToast("Membuka Berkas Gambar...");
                 };
 
-                // Audio Logic
+                // Logika Kontrol Audio - Dioptimalkan untuk Android/iPhone
                 const toggleMusic = () => {
                     const audio = document.getElementById('bg-audio');
+                    if (!audio) return;
+
                     if (musicActive.value) {
                         audio.pause();
                         musicActive.value = false;
                     } else {
-                        audio.play().catch(e => {
-                            console.log("Autoplay blocked. User interaction required.");
-                        });
-                        musicActive.value = true;
+                        // Memastikan audio terisi dan diputar setelah interaksi user
+                        const playPromise = audio.play();
+                        
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                musicActive.value = true;
+                            }).catch(error => {
+                                console.error("Playback failed:", error);
+                                showToast("Klik layar untuk mengizinkan audio");
+                            });
+                        }
                     }
                 };
 
                 onMounted(() => {
                     initThree();
-                    // Audio Autoplay Handler on first interaction
-                    const handleFirstInteraction = () => {
-                        const audio = document.getElementById('bg-audio');
-                        document.removeEventListener('click', handleFirstInteraction);
-                    };
-                    document.addEventListener('click', handleFirstInteraction);
                 });
 
                 return { config, toast, copy, downloadQR, musicActive, toggleMusic };
@@ -364,7 +389,7 @@
     </script>
 
     <style>
-        /* Animasi Pemberitahuan */
+        /* Animasi Toast */
         .toast-enter-active { animation: toastIn 0.8s cubic-bezier(0.19, 1, 0.22, 1); }
         .toast-leave-active { animation: toastIn 0.4s reverse ease-in; }
         
