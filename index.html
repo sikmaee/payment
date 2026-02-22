@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUXX PAY - Zenith AI Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RUXX PAY - Zenith Audio Edition</title>
     <!-- Framework & Library Utama -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -25,6 +25,7 @@
             color: #f8fafc;
             overflow-x: hidden;
             margin: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #canvas-background {
@@ -50,22 +51,30 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Animasi Transisi Chat */
-        .chat-enter-active, .chat-leave-active { transition: all 0.4s ease; }
-        .chat-enter-from { opacity: 0; transform: translateY(10px); }
-
         /* Custom Scrollbar Korporat */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--zenith-indigo); border-radius: 10px; }
 
-        .ai-bubble {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-left: 4px solid var(--zenith-blue);
+        .step-number {
+            background: linear-gradient(135deg, var(--zenith-indigo), #4338ca);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 800;
         }
 
-        .user-bubble {
-            background: linear-gradient(135deg, var(--zenith-indigo), #4338ca);
+        /* Audio Control Animation */
+        .audio-pulse {
+            animation: pulse-audio 2s infinite;
+        }
+        @keyframes pulse-audio {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
         }
     </style>
 </head>
@@ -74,151 +83,152 @@
     <!-- Engine Latar Belakang Three.js -->
     <div id="canvas-background"></div>
 
-    <div id="app" v-cloak class="max-w-5xl mx-auto min-h-screen p-6 pb-24 flex flex-col relative z-10">
+    <div id="app" v-cloak class="max-w-2xl mx-auto min-h-screen p-4 sm:p-6 pb-24 flex flex-col relative z-10">
         
+        <!-- Audio Control Floating Button -->
+        <div class="fixed top-6 right-6 z-[60]">
+            <button @click="toggleMusic" 
+                class="w-12 h-12 flex items-center justify-center rounded-2xl glass-container border-white/10 text-white transition-all active:scale-90"
+                :class="{'audio-pulse border-sky-500/40': musicActive}">
+                <i :class="musicActive ? 'ph-bold ph-speaker-high text-sky-400' : 'ph-bold ph-speaker-slash text-slate-500'" class="text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Hidden Audio Element -->
+        <audio id="bg-audio" loop preload="auto">
+            <source src="https://cdn.pixabay.com/audio/2022/01/21/audio_31b3484294.mp3" type="audio/mpeg">
+        </audio>
+
         <!-- Tajuk Resmi -->
-        <header class="py-20 text-center animate-in fade-in duration-1000">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/50 mb-8 shadow-2xl">
+        <header class="py-12 sm:py-20 text-center animate-in fade-in duration-1000">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/50 mb-6 shadow-2xl">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">Sistem Pembayaran Terenkripsi</span>
+                <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">Gateway Terenkripsi</span>
             </div>
-            <h1 class="text-8xl font-black italic tracking-tighter uppercase leading-none gradient-text" style="font-family: 'Space Grotesk', sans-serif;">
+            <h1 class="text-6xl sm:text-8xl font-black italic tracking-tighter uppercase leading-none gradient-text" style="font-family: 'Space Grotesk', sans-serif;">
                 RUXX<span class="text-sky-500">PAY</span>
             </h1>
-            <p class="mt-6 text-[11px] font-medium text-slate-500 uppercase tracking-[1.2em]">Solusi Pembayaran Digital Mutakhir</p>
+            <p class="mt-4 text-[10px] sm:text-[11px] font-medium text-slate-500 uppercase tracking-[1em]">Portal Pembayaran Digital</p>
         </header>
 
         <!-- Modul Pembayaran Utama -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+        <div class="space-y-8 mb-12">
             
             <!-- Modul 01: QRIS Resmi -->
-            <section class="space-y-6">
-                <div class="flex items-center gap-3 px-6">
-                    <i class="ph-fill ph-qr-code text-sky-400 text-2xl"></i>
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Kode QRIS Standard</h2>
+            <section class="space-y-4">
+                <div class="flex items-center gap-3 px-4">
+                    <i class="ph-fill ph-qr-code text-sky-400 text-xl"></i>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Metode QRIS All Payment</h2>
                 </div>
                 
-                <div class="glass-container rounded-[3rem] p-10 flex flex-col items-center space-y-10 group transition-all duration-500 hover:border-sky-500/30">
-                    <div class="relative bg-white p-6 rounded-[2.5rem] shadow-2xl transition-transform duration-700 group-hover:scale-105">
-                        <img :src="config.qrisUrl" alt="RUXX QRIS" class="w-64 h-64 object-contain rounded-xl">
+                <div class="glass-container rounded-[2.5rem] p-6 sm:p-10 flex flex-col items-center space-y-8 group">
+                    <div class="relative bg-white p-4 sm:p-6 rounded-[2rem] shadow-2xl">
+                        <img :src="config.qrisUrl" alt="RUXX QRIS" class="w-56 h-56 sm:w-64 sm:h-64 object-contain rounded-xl">
                     </div>
-                    <div class="w-full space-y-4">
-                        <button @click="downloadQR" class="w-full py-5 bg-white text-slate-900 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-100 transition-all active:scale-95 shadow-xl">
+                    <div class="w-full">
+                        <button @click="downloadQR" class="w-full py-4 sm:py-5 bg-white text-slate-900 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl">
                             <i class="ph-bold ph-download-simple text-xl"></i>
                             Unduh Kode QR
                         </button>
-                        <p class="text-[10px] text-center text-slate-500 font-medium italic">Mendukung seluruh aplikasi E-Wallet dan Perbankan.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Modul 02: DANA Resmi -->
-            <section class="space-y-6">
-                <div class="flex items-center gap-3 px-6">
-                    <i class="ph-fill ph-wallet text-indigo-400 text-2xl"></i>
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Transfer Dompet DANA</h2>
+            <section class="space-y-4">
+                <div class="flex items-center gap-3 px-4">
+                    <i class="ph-fill ph-wallet text-indigo-400 text-xl"></i>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Metode Transfer DANA</h2>
                 </div>
 
-                <div class="glass-container rounded-[3rem] p-12 flex flex-col justify-center space-y-12 relative overflow-hidden group transition-all duration-500 hover:border-indigo-500/30">
-                    <div class="space-y-6 relative z-10 text-left">
+                <div class="glass-container rounded-[2.5rem] p-8 sm:p-10 flex flex-col justify-center space-y-8 relative overflow-hidden">
+                    <div class="space-y-4 relative z-10 text-left">
                         <div>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Nomor Rekening Tujuan</p>
-                            <h3 class="text-5xl font-black tracking-widest text-sky-400 leading-none" style="font-family: 'Space Grotesk', sans-serif;">
+                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nomor Rekening Tujuan</p>
+                            <h3 class="text-3xl sm:text-4xl font-black tracking-widest text-sky-400 leading-none" style="font-family: 'Space Grotesk', sans-serif;">
                                 {{ config.danaNumber }}
                             </h3>
                         </div>
-                        <div class="flex items-center gap-4 py-4 px-6 rounded-2xl bg-slate-900/50 border border-white/5">
-                            <i class="ph-fill ph-user-circle text-3xl text-slate-500"></i>
+                        <div class="flex items-center gap-4 py-3 px-5 rounded-2xl bg-slate-900/50 border border-white/5">
+                            <i class="ph-fill ph-user-circle text-2xl text-slate-500"></i>
                             <div>
-                                <p class="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Atas Nama Penerima</p>
-                                <p class="text-sm font-bold uppercase text-slate-200">{{ config.danaName }}</p>
+                                <p class="text-[8px] font-bold text-slate-600 uppercase tracking-widest">Nama Penerima</p>
+                                <p class="text-xs font-bold uppercase text-slate-200">{{ config.danaName }}</p>
                             </div>
                         </div>
                     </div>
 
-                    <button @click="copy(config.danaNumber)" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-indigo-500 transition-all active:scale-95 shadow-2xl shadow-indigo-600/30 relative z-10">
+                    <button @click="copy(config.danaNumber)" class="w-full py-4 sm:py-5 bg-indigo-600 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all shadow-2xl shadow-indigo-600/30 relative z-10">
                         <i class="ph-bold ph-copy-simple text-xl"></i>
                         Salin Nomor Rekening
                     </button>
                 </div>
             </section>
+
+            <!-- Modul 03: Panduan Pembayaran -->
+            <section class="space-y-4 animate-in fade-in duration-1000">
+                <div class="flex items-center gap-3 px-4">
+                    <i class="ph-fill ph-info text-emerald-400 text-xl"></i>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Panduan Pembayaran</h2>
+                </div>
+
+                <div class="glass-container rounded-[2.5rem] p-8 sm:p-10 space-y-8">
+                    <!-- QRIS Steps -->
+                    <div class="space-y-4">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-sky-500 border-b border-sky-500/20 pb-2">Melalui QRIS</p>
+                        <ul class="space-y-3">
+                            <li class="flex gap-4 items-start">
+                                <span class="step-number mt-0.5">1</span>
+                                <p class="text-xs text-slate-300 leading-relaxed">Unduh atau tangkap layar (screenshot) kode QR di atas.</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="step-number mt-0.5">2</span>
+                                <p class="text-xs text-slate-300 leading-relaxed">Buka aplikasi E-Wallet (DANA, OVO, GoPay) atau Mobile Banking Anda.</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="step-number mt-0.5">3</span>
+                                <p class="text-xs text-slate-300 leading-relaxed">Pilih menu "Scan" atau "Bayar" dan unggah gambar kode QR dari galeri.</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- DANA Steps -->
+                    <div class="space-y-4">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-indigo-500 border-b border-indigo-500/20 pb-2">Melalui DANA Transfer</p>
+                        <ul class="space-y-3">
+                            <li class="flex gap-4 items-start">
+                                <span class="step-number mt-0.5">1</span>
+                                <p class="text-xs text-slate-300 leading-relaxed">Salin nomor rekening tujuan yang tertera di atas.</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="step-number mt-0.5">2</span>
+                                <p class="text-xs text-slate-300 leading-relaxed">Buka aplikasi DANA dan pilih menu "Kirim".</p>
+                            </li>
+                            <li class="flex gap-4 items-start">
+                                <span class="step-number mt-0.5">3</span>
+                                <p class="text-xs text-slate-300 leading-relaxed">Tempel nomor dan pastikan nama penerima sesuai sebelum mengonfirmasi.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <!-- Modul 03: Pusat Bantuan AI Zenith -->
-        <section class="flex-1 flex flex-col space-y-8 animate-in fade-in duration-1000">
-            <div class="flex items-center justify-between px-8">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-sky-600 flex items-center justify-center shadow-2xl shadow-sky-600/30">
-                        <i class="ph-fill ph-robot text-2xl text-white"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-bold uppercase tracking-tight italic">Asisten AI Zenith</h2>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status: Aktif</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-container rounded-[3.5rem] flex-1 flex flex-col overflow-hidden min-h-[550px] border-white/5">
-                <!-- Arus Percakapan -->
-                <div ref="chatContainer" class="flex-1 overflow-y-auto p-10 space-y-8">
-                    <transition-group name="chat">
-                        <div v-for="(msg, i) in chat.messages" :key="i" 
-                            :class="msg.role === 'user' ? 'flex flex-row-reverse' : 'flex flex-row'"
-                        >
-                            <div :class="msg.role === 'user' ? 'user-bubble rounded-tr-none' : 'ai-bubble rounded-tl-none text-slate-200'" 
-                                 class="max-w-[85%] px-8 py-5 shadow-2xl transition-all">
-                                <p class="text-sm font-medium leading-relaxed tracking-wide italic">{{ msg.text }}</p>
-                            </div>
-                        </div>
-                    </transition-group>
-                    
-                    <!-- Indikator Berpikir AI -->
-                    <div v-if="chat.isTyping" class="flex flex-row">
-                        <div class="ai-bubble px-8 py-5 flex items-center gap-2">
-                            <span class="w-2 h-2 bg-sky-400 rounded-full animate-bounce"></span>
-                            <span class="w-2 h-2 bg-sky-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                            <span class="w-2 h-2 bg-sky-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Panel Input Perintah -->
-                <div class="p-8 bg-slate-900/50 border-t border-white/5 flex gap-5">
-                    <input 
-                        v-model="chat.userInput" 
-                        @keyup.enter="sendMessage"
-                        type="text" 
-                        placeholder="Sampaikan pertanyaan atau kendala Anda di sini..." 
-                        class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-sm font-medium outline-none focus:border-sky-500 focus:bg-white/10 transition-all placeholder:text-slate-700"
-                    >
-                    <button 
-                        @click="sendMessage" 
-                        :disabled="!chat.userInput || chat.isTyping"
-                        class="w-16 h-16 bg-sky-600 text-white rounded-2xl flex items-center justify-center hover:bg-sky-500 active:scale-90 transition-all disabled:opacity-30 shadow-2xl shadow-sky-600/40"
-                    >
-                        <i class="ph-bold ph-paper-plane-right text-3xl"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
         <!-- Kaki Halaman -->
-        <footer class="py-24 text-center space-y-6 opacity-40">
-            <p class="text-[10px] font-bold uppercase tracking-[1.5em] text-slate-500">Sistem Finansial Otonom &bull; RUXX Enterprise</p>
+        <footer class="py-12 text-center space-y-6 opacity-40">
+            <p class="text-[9px] font-bold uppercase tracking-[1em] text-slate-500">RUXX Enterprise &bull; 2024</p>
         </footer>
 
         <!-- Notifikasi Toast Zenith -->
         <transition name="toast">
-            <div v-if="toast.show" class="fixed top-12 left-0 right-0 z-[100] flex justify-center px-6">
-                <div class="bg-white text-slate-900 px-10 py-6 rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,1)] flex items-center gap-6">
-                    <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-xl">
-                        <i class="ph-fill ph-info text-2xl"></i>
+            <div v-if="toast.show" class="fixed top-10 left-0 right-0 z-[100] flex justify-center px-6">
+                <div class="bg-white text-slate-900 px-8 py-4 rounded-[2rem] shadow-2xl flex items-center gap-4">
+                    <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-xl">
+                        <i class="ph-fill ph-check-circle text-xl"></i>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Sistem Pemberitahuan</span>
-                        <span class="text-sm font-bold uppercase tracking-tight mt-1">{{ toast.msg }}</span>
+                        <span class="text-[9px] font-bold uppercase text-slate-400 tracking-widest leading-none">Status</span>
+                        <span class="text-xs font-bold uppercase tracking-tight mt-1">{{ toast.msg }}</span>
                     </div>
                 </div>
             </div>
@@ -227,7 +237,7 @@
     </div>
 
     <script>
-        const { createApp, ref, onMounted, nextTick } = Vue;
+        const { createApp, ref, onMounted } = Vue;
 
         createApp({
             setup() {
@@ -238,17 +248,9 @@
                 });
 
                 const toast = ref({ show: false, msg: '' });
-                const chatContainer = ref(null);
-                
-                const chat = ref({
-                    userInput: '',
-                    isTyping: false,
-                    messages: [
-                        { role: 'assistant', text: 'Selamat datang di RUXX PAYMENT. Saya adalah Asisten AI Zenith. Mohon sampaikan apabila Anda memerlukan bantuan terkait instruksi pembayaran atau kendala teknis lainnya.' }
-                    ]
-                });
+                const musicActive = ref(false);
 
-                // ENGINE LATAR BELAKANG THREE.JS (SPACE FIELD)
+                // ENGINE LATAR BELAKANG THREE.JS
                 const initThree = () => {
                     const scene = new THREE.Scene();
                     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -259,7 +261,7 @@
                     // Partikel Bintang
                     const geometry = new THREE.BufferGeometry();
                     const vertices = [];
-                    for (let i = 0; i < 8000; i++) {
+                    for (let i = 0; i < 4000; i++) {
                         vertices.push(
                             THREE.MathUtils.randFloatSpread(2000), 
                             THREE.MathUtils.randFloatSpread(2000), 
@@ -269,9 +271,9 @@
                     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
                     const material = new THREE.PointsMaterial({ 
                         color: 0xffffff, 
-                        size: 1.2, 
+                        size: 1.5, 
                         transparent: true, 
-                        opacity: 0.6,
+                        opacity: 0.5,
                         blending: THREE.AdditiveBlending 
                     });
                     const stars = new THREE.Points(geometry, material);
@@ -280,15 +282,20 @@
                     camera.position.z = 1;
 
                     let targetX = 0, targetY = 0;
-                    document.addEventListener('mousemove', (e) => {
-                        targetX = (e.clientX - window.innerWidth / 2) * 0.0001;
-                        targetY = (e.clientY - window.innerHeight / 2) * 0.0001;
-                    });
+                    const handleMove = (e) => {
+                        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                        targetX = (clientX - window.innerWidth / 2) * 0.0001;
+                        targetY = (clientY - window.innerHeight / 2) * 0.0001;
+                    };
+
+                    document.addEventListener('mousemove', handleMove);
+                    document.addEventListener('touchmove', handleMove);
 
                     const animate = () => {
                         requestAnimationFrame(animate);
-                        stars.rotation.x += 0.0002;
-                        stars.rotation.y += 0.0003;
+                        stars.rotation.x += 0.0001;
+                        stars.rotation.y += 0.0002;
                         camera.rotation.y += (targetX - camera.rotation.y) * 0.05;
                         camera.rotation.x += (targetY - camera.rotation.x) * 0.05;
                         renderer.render(scene, camera);
@@ -316,90 +323,45 @@
                     showToast("Nomor Berhasil Disalin");
                 };
 
-                // Mekanisme Unduh QRIS Terpadu
                 const downloadQR = () => {
                     const link = document.createElement('a');
                     link.href = config.value.qrisUrl;
                     link.target = '_blank';
-                    // Catatan: 'download' atribut mungkin diblokir oleh CORS GitHub. 
-                    // Kami menggunakan pendekatan membuka di tab baru apabila pengunduhan langsung gagal.
                     link.setAttribute('download', 'RUXX-QRIS.jpg');
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    showToast("Membuka Berkas Gambar...");
+                    showToast("Membuka Gambar...");
                 };
 
-                const scrollToBottom = async () => {
-                    await nextTick();
-                    if (chatContainer.value) {
-                        chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-                    }
-                };
-
-                // SISTEM AI TERPADU DENGAN EXPONENTIAL BACKOFF
-                const apiKey = ""; // Disuntikkan otomatis oleh lingkungan
-                const callGemini = async (prompt) => {
-                    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                    
-                    const systemPrompt = `Anda adalah Asisten AI Zenith dari RUXX PAY.
-                    Konteks Operasional: Layanan pembayaran digital RUXX PAY. 
-                    Informasi Transaksi: DANA Nomor ${config.value.danaNumber} (Atas Nama ${config.value.danaName}), QRIS mendukung semua dompet digital.
-                    Karakteristik: Formal, sangat sopan, profesional, dan solutif. Gunakan Bahasa Indonesia Baku. Hindari penggunaan bahasa gaul. Jawab dengan ringkas namun informatif.`;
-
-                    const payload = {
-                        contents: [{ parts: [{ text: prompt }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] }
-                    };
-
-                    const delays = [1000, 2000, 4000, 8000, 16000];
-                    for (let i = 0; i <= delays.length; i++) {
-                        try {
-                            const res = await fetch(endpoint, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload)
-                            });
-                            
-                            if (!res.ok) throw new Error(`Status: ${res.status}`);
-                            
-                            const data = await res.json();
-                            const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                            
-                            if (!responseText) throw new Error("Respons Kosong");
-                            return responseText;
-                        } catch (e) {
-                            if (i === delays.length) return "Mohon maaf, terjadi gangguan pada jaringan komunikasi AI kami. Mohon hubungi administrator secara manual.";
-                            await new Promise(resolve => setTimeout(resolve, delays[i]));
-                        }
-                    }
-                };
-
-                const sendMessage = async () => {
-                    if (!chat.value.userInput || chat.value.isTyping) return;
-                    
-                    const text = chat.value.userInput;
-                    chat.value.messages.push({ role: 'user', text });
-                    chat.value.userInput = '';
-                    chat.value.isTyping = true;
-                    await scrollToBottom();
-
-                    try {
-                        const response = await callGemini(text);
-                        chat.value.messages.push({ role: 'assistant', text: response });
-                    } catch (e) {
-                        chat.value.messages.push({ role: 'assistant', text: "Terjadi kesalahan sistem saat memproses permintaan Anda." });
-                    } finally {
-                        chat.value.isTyping = false;
-                        await scrollToBottom();
+                // Audio Logic
+                const toggleMusic = () => {
+                    const audio = document.getElementById('bg-audio');
+                    if (musicActive.value) {
+                        audio.pause();
+                        musicActive.value = false;
+                    } else {
+                        audio.play().catch(e => {
+                            console.log("Autoplay blocked. User interaction required.");
+                        });
+                        musicActive.value = true;
                     }
                 };
 
                 onMounted(() => {
                     initThree();
+                    // Audio Autoplay Handler on first interaction
+                    const handleFirstInteraction = () => {
+                        const audio = document.getElementById('bg-audio');
+                        // Optional: Un-comment below to autoplay on first click anywhere
+                        // audio.play();
+                        // musicActive.value = true;
+                        document.removeEventListener('click', handleFirstInteraction);
+                    };
+                    document.addEventListener('click', handleFirstInteraction);
                 });
 
-                return { config, toast, chat, chatContainer, copy, downloadQR, sendMessage };
+                return { config, toast, copy, downloadQR, musicActive, toggleMusic };
             }
         }).mount('#app');
     </script>
